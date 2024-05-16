@@ -1,30 +1,51 @@
-import { useState } from 'react'
+import React, { useState } from 'react';
 
-export const SearchBar = ({ loadWeather }: { loadWeather: (city: string) => Promise<void> }): JSX.Element => {
+interface SearchBarProps {
+  loadWeather: (city: string) => void;
+}
+
+export const SearchBar: React.FC<SearchBarProps> = ({ loadWeather }) => {
   const [city, setCity] = useState('');
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [error, setError] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCity(value);
+
+    // Simple validation for non-empty input
+    if (value.trim() === '') {
+      setError('Please enter a valid city, state, or country.');
+    } else {
+      setError('');
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    loadWeather(city);
-    setCity('')
-  }
+    if (city.trim() !== '') {
+      loadWeather(city);
+      setCity('');
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="h-4/5 flex w-3/4 justify-center">
+    <form onSubmit={handleSubmit} className="flex flex-col items-center space-y-4 animate-fade-in">
       <input
-        id="city"
-        className="w-4/12 border-2 border-gray-300 h-16 mx-4 rounded-xl w-1/2 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-        name="city"
         type="text"
-        placeholder="Enter city name"
         value={city}
-        onChange={(e) => setCity(e.target.value)}
+        onChange={handleChange}
+        placeholder="Enter city, state, or country"
+        className="w-full p-2 rounded-lg border-2 border-transparent focus:border-blue-500 focus:outline-none transition duration-300 text-black"
       />
+      {error && <p className="text-red-500">{error}</p>}
       <button
         type="submit"
-        className="w-2/12 bg-blue-500 text-white h-16 p-2 rounded-xl w-1/4"
+        disabled={city.trim() === ''}
+        className={`w-full p-2 rounded-lg bg-blue-500 text-white transition duration-300 ${city.trim() === '' ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
+          }`}
       >
-        Search
+        Get Weather
       </button>
     </form>
-  )
-}
+  );
+};
