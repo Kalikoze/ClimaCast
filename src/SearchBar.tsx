@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface SearchBarProps {
   loadWeather: (city: string) => void;
@@ -7,6 +8,7 @@ interface SearchBarProps {
 export const SearchBar: React.FC<SearchBarProps> = ({ loadWeather }) => {
   const [city, setCity] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -25,6 +27,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ loadWeather }) => {
     if (city.trim() !== '') {
       loadWeather(city);
       setCity('');
+      navigate(`/weather/${city}}`);
     }
   };
 
